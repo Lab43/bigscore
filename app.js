@@ -9,7 +9,6 @@ var express = require('express')
 
 
 
-
 // =============
 // configure app
 // =============
@@ -17,6 +16,8 @@ var express = require('express')
 app
   .set('views', __dirname)
   .set('view engine', 'jade')
+  .use(express.favicon())
+  .use(express.logger('dev'))
   .use(express.static(__dirname + '/public'))
 ;
 
@@ -27,15 +28,73 @@ app
 // routes
 // ======
 
-app.get('/', function (req, res) {
+app.get('/', function (req, res, next) {
   res.render('index');
 });
-app.get('/:gid', function (req, res) {
-  res.render('game', {
-    gid: req.params.gid,
-  });
+app.get('/new', function (req, res, next) {
+  newGame(req, res, next);
+});
+app.get('/:code', function (req, res, next) {
+  var params = req.params.code.split('-');
+  res.locals.gid = params[0];
+  res.locals.pass = params[1];
+  if (params.length === 1) {
+    spectator(req, res, next);
+  } else if (params.length === 2) {
+    scorekeeper(req, res, next);
+  } else {
+    res.send(404);
+  }
 });
 
+
+function spectator(req, res, next) {
+  var gid = res.locals.gid;
+  // check if the game exists
+  store.exists('games:' + gid + ':pass', function (err, exists) {
+    if (!exists) return res.send(404);
+    res.render('game', {
+      gid: gid
+    });
+  });
+}
+
+function scorekeeper(req, res, next) {
+  var gid = res.locals.gid
+    , pass = res.locals.pass
+  ;
+  // check that the game exists and pass is correct
+  store.get('games:' + gid + ':pass', function (err, storedPass) {
+    if (storedPass !== pass) return res.send(401);
+    res.render('game', {
+      gid: gid,
+      pass: pass
+    });
+  });
+}
+
+function newGame(req, res, next) {
+  async.waterfall([
+    // get next game id and generate password
+    function (callback) {
+      store.incr('gid-counter', function(err, gid) {
+        gid = gid.toString(36);
+        // generate random 4 character alphanumeric string (0-9, a-z)
+        var pass = Math.random().toString(36).substr(2, 4);
+        callback(err, gid, pass);
+      });
+    },
+    // save game id and password
+    function (gid, pass, callback) {
+      store.set('games:' + gid + ':pass', pass, function (err, val) {
+        callback(err, {gid: gid, pass: pass});
+      });
+    }
+  ], function (err, result) {
+    if (err) return next(err);
+    res.redirect('/' + result.gid + '-' + result.pass);
+  });
+}
 
 
 
@@ -44,29 +103,13 @@ app.get('/:gid', function (req, res) {
 // =============
 
 io.sockets.on('connection', function (socket) {
-
-  var game = null;
-
-  socket
-    .on('join', function (data) {
-      socket.join(data.gid);
-      game = new Game(data.gid);
+  socket.on('join', function (data) {
+    socket.join(data.gid);
+    joinGame(socket, data.gid, function (err) {
+      if (err) return console.log(err);
       socket.emit('joined', {gid: game.id});
-      game.broadcastUpdate();
-    })
-    .on('add player', function (data) {
-      game.addPlayer();
-    })
-    .on('delete player', function (data) {
-      game.deletePlayer(data.i);
-    })
-    .on('update name', function (data) {
-      game.updateName(data.i, data.n);
-    })
-    .on('update score', function (data) {
-      game.updateScore(data.i, data.s);
-    })
-  ;
+    });
+  });
 });
 
 
@@ -76,7 +119,7 @@ io.sockets.on('connection', function (socket) {
 // game model
 // ==========
 
-function Game(gid) {
+function joinGame(socket, gid) {
 
   this.id = gid;
 
@@ -84,6 +127,21 @@ function Game(gid) {
     , key = 'games:' + gid
     , namesKey = key + ':names'
     , scoresKey = key + ':scores'
+  ;
+
+  socket
+    .on('add player', function (data) {
+      self.addPlayer();
+    })
+    .on('delete player', function (data) {
+      self.deletePlayer(data.i);
+    })
+    .on('update name', function (data) {
+      self.updateName(data.i, data.n);
+    })
+    .on('update score', function (data) {
+      self.updateScore(data.i, data.s);
+    })
   ;
 
   this.broadcastUpdate = function () {
@@ -179,6 +237,8 @@ function Game(gid) {
       self.broadcastUpdate();
     });
   };
+
+  self.broadcastUpdate();
 
 }
 
