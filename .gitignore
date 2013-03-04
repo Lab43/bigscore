@@ -1,14 +1,15 @@
-lib-cov
-*.seed
-*.log
-*.csv
-*.dat
-*.out
-*.pid
-*.gz
+# os x
+.DS_Store
+Icon?
+._*
+.Spotlight-V100
+.Trashes
 
-pids
-logs
-results
+# nodejs npm modules
+/node_modules
 
-npm-debug.log
+# redis dump
+*.rdb
+
+# sass
+.sass-cache

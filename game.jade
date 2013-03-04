@@ -1,0 +1,19 @@
+html
+  head
+    title BigScore
+    script
+      var config = {
+        gid: '#{gid}'
+      };
+  head
+
+  body
+    h1 Game!
+
+    #players
+
+    button.add-player Add User
+
+    script(src='/socket.io/socket.io.js')
+    script(src='http://code.jquery.com/jquery-1.9.1.min.js')
+    script(src='/scripts.js')
