@@ -1,0 +1,27 @@
+@import "compass";
+
+#players {
+  position: relative;
+  height: 100px;
+}
+
+.player {
+  position: absolute;
+  left: 0;
+  background: red;
+  height: 40px;
+  margin: 5px;
+  @include transition(top 0.3s);
+}
+
+[data-place="1"] {
+  top: 0;
+}
+
+[data-place="2"] {
+  top: 50px;
+}
+
+[data-moved="up"] {
+  z-index: 1;
+}

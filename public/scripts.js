@@ -2,7 +2,7 @@
 // game data
 // =========
 
-function Game(socket, gid, page) {
+function Game(socket, gid, pass, page) {
 
   var names = []
     , scores = []
@@ -11,7 +11,7 @@ function Game(socket, gid, page) {
 
   socket
     .on('connect', function () {
-      socket.emit('join', {gid: gid});
+      socket.emit('join', {gid: gid, pass: pass});
     })
     .on('joined', function (data) {
       console.log('joined game ' + data.gid);
@@ -36,16 +36,19 @@ function Game(socket, gid, page) {
 
   this.updateScore = function (index, score) {
     scores[index] = score;
+    page.delayedSort();
     socket.emit('update score', {i: index, s: score});
   };
 
   this.incrScore = function (index) {
     scores[index]++;
+    page.updateScore(index, scores[index]);
     self.updateScore(index, scores[index]);
   };
 
   this.decrScore = function (index) {
     scores[index]--;
+    page.updateScore(index, scores[index]);
     self.updateScore(index, scores[index]);
   };
 
@@ -53,6 +56,7 @@ function Game(socket, gid, page) {
   function handleUpdate(data) {
     var oldNames = names.slice(0)
       , oldScores = scores.slice(0)
+      , sortChange = false
     ;
     names = data.n;
     scores = data.s;
@@ -65,12 +69,17 @@ function Game(socket, gid, page) {
       page.updateAll(output);
     } else {
       for (var j = 0; j < names.length; j++) {
-        if (oldNames[j] !== names[j])
+        if (oldNames[j] !== names[j]) {
           page.updateName(j, names[j]);
-        if (oldScores[j] !== scores[j])
+        }
+        if (oldScores[j] !== scores[j]) {
           page.updateScore(j, scores[j]);
+          sortChange = true;
+        }
       }
     }
+    // if there were score changes, sort immediately
+    if (sortChange) page.sort();
   }
 
 }
@@ -92,7 +101,8 @@ function Page($) {
     $.each(data, function (i, val) {
       html += renderPlayer({index: i, name: this.name, score: this.score});
     });
-    $('#players').html(html);
+    // sort players and insert into page
+    $('#players').empty().append( $(html).sortPlayers() );
   };
 
   this.updateName = function (index, name) {
@@ -103,16 +113,16 @@ function Page($) {
     playerAtIndex(index).find('.score').val(score);
   };
 
-  // delayed sort would be called by game.updateScore, and other actions would shouldn't sort immediately because they would disrupt user interaction
   this.delayedSort = function () {
     clearTimeout(sortDelay);
-    sortDelay = setTimeout(self.sort, 1000);
+    sortDelay = setTimeout(function () {
+      self.sort();
+    }, 1500);
   };
-  // sort is called by actions that should cause an immediate sort, such as update coming from the server
-  this.sort = function (force) {
-    // if force is true, cancel the sortDelay timeout and sort immediately
-    // if force is false/undefined only sort immediately if there is no sortDelay, otherwise just wait for the delay to time out. This is useful if an update message is sent from the server while thie user is currently interacting with the app
-    // sort code
+
+  this.sort = function () {
+    clearTimeout(sortDelay);
+    $('.player').sortPlayers();
   };
 
   // private methods
@@ -145,7 +155,7 @@ function Page($) {
   // set up app
   var socket = io.connect('http://localhost:3000')
     , page = new Page($)
-    , game = new Game(socket, config.gid, page)
+    , game = new Game(socket, config.gid, config.pass, page)
   ;
 
   // ui actions
@@ -166,14 +176,58 @@ function Page($) {
       game.updateName(playerIndexOf(this), $(this).val());
     })
     .on('keyup', '.score', function (e) {
-      game.updateScore(playerIndexOf(this), $(this).val());
+      game.updateScore(playerIndexOf(this), parseInt($(this).val(), 10));
     })
   ;
 
-  // helper functions
-  function playerIndexOf(elem) {
-    if (!(elem instanceof $)) elem = $(elem);
-    return parseInt(elem.closest('.player').attr('data-index'), 10);
-  }
+})(jQuery);
+
+// helper functions
+function playerIndexOf(elem) {
+  if (!(elem instanceof jQuery)) elem = jQuery(elem);
+  var player = elem.hasClass('.player') ? elem : elem.closest('.player');
+  return parseInt(player.attr('data-index'), 10);
+}
+
+
+
+
+// ==============
+// jquery plugins
+// ==============
+
+(function ($){
+
+  $.fn.sortPlayers = function() {
+
+    var sortMe = []
+      , $players = this
+    ;
+
+    $players.each(function (i) {
+      sortMe.push({
+        prevPlace: parseInt($(this).attr('data-place'), 10) || 0,
+        index: i,
+        score: parseInt($(this).find('.score').val(), 10),
+      });
+    });
+    sortMe.sort(function (a, b) {
+      // if there's a tie, preserve previous order
+      if (b.score === a.score) return a.prevPlace - b.prevPlace;
+      return b.score - a.score;
+    });
+    $.each(sortMe, function (place, player) {
+      // places start at 1, not 0
+      place++;
+      var direction = (place < player.prevPlace) ? 'up' : 'down';
+      $($players.get(player.index))
+        .attr('data-place', place)
+        .attr('data-moved', direction);
+      ;
+    });
+
+    return $players;
+
+  };
 
 })(jQuery);

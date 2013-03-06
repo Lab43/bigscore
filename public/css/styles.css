@@ -1,0 +1,33 @@
+/* line 3, ../scss/styles.scss */
+#players {
+  position: relative;
+  height: 100px;
+}
+
+/* line 8, ../scss/styles.scss */
+.player {
+  position: absolute;
+  left: 0;
+  background: red;
+  height: 40px;
+  margin: 5px;
+  -webkit-transition: top 0.3s;
+  -moz-transition: top 0.3s;
+  -o-transition: top 0.3s;
+  transition: top 0.3s;
+}
+
+/* line 17, ../scss/styles.scss */
+[data-place="1"] {
+  top: 0;
+}
+
+/* line 21, ../scss/styles.scss */
+[data-place="2"] {
+  top: 50px;
+}
+
+/* line 25, ../scss/styles.scss */
+[data-moved="up"] {
+  z-index: 1;
+}

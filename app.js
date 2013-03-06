@@ -54,7 +54,8 @@ function spectator(req, res, next) {
   store.exists('games:' + gid + ':pass', function (err, exists) {
     if (!exists) return res.send(404);
     res.render('game', {
-      gid: gid
+      gid: gid,
+      pass: null
     });
   });
 }
@@ -105,9 +106,9 @@ function newGame(req, res, next) {
 io.sockets.on('connection', function (socket) {
   socket.on('join', function (data) {
     socket.join(data.gid);
-    joinGame(socket, data.gid, function (err) {
+    joinGame(socket, data.gid, data.pass, function (err) {
       if (err) return console.log(err);
-      socket.emit('joined', {gid: game.id});
+      socket.emit('joined', {gid: data.gid});
     });
   });
 });
@@ -119,7 +120,7 @@ io.sockets.on('connection', function (socket) {
 // game model
 // ==========
 
-function joinGame(socket, gid) {
+function joinGame(socket, gid, pass, callback) {
 
   this.id = gid;
 
@@ -129,31 +130,45 @@ function joinGame(socket, gid) {
     , scoresKey = key + ':scores'
   ;
 
-  socket
-    .on('add player', function (data) {
-      self.addPlayer();
-    })
-    .on('delete player', function (data) {
-      self.deletePlayer(data.i);
-    })
-    .on('update name', function (data) {
-      self.updateName(data.i, data.n);
-    })
-    .on('update score', function (data) {
-      self.updateScore(data.i, data.s);
-    })
-  ;
+  // authorize
+  if (pass) {
+    store.get('games:' + gid + ':pass', function (err, storedPass) {
+      if (err) return console.log(err);
+      if (storedPass !== pass) return callback('Password "'+pass+'" incorrect.');
+      self.registerApi();
+    });
+  }
+
+  this.registerApi = function () {
+    socket
+      .on('add player', function (data) {
+        self.addPlayer();
+      })
+      .on('delete player', function (data) {
+        self.deletePlayer(data.i);
+      })
+      .on('update name', function (data) {
+        self.updateName(data.i, data.n);
+      })
+      .on('update score', function (data) {
+        self.updateScore(data.i, data.s);
+      })
+    ;
+  };
 
   this.broadcastUpdate = function () {
     async.parallel([
       function (callback) {
-        store.lrange(namesKey, 0, -1, function (err, res) {
-          callback(err, res);
+        store.lrange(namesKey, 0, -1, function (err, result) {
+          callback(err, result);
         });
       },
       function (callback) {
-        store.lrange(scoresKey, 0, -1, function (err, res) {
-          callback(err, res);
+        store.lrange(scoresKey, 0, -1, function (err, result) {
+          result = result.map(function (string) {
+            return parseInt(string, 10);
+          });
+          callback(err, result);
         });
       }
     ],
@@ -238,6 +253,7 @@ function joinGame(socket, gid) {
     });
   };
 
+  callback(null);
   self.broadcastUpdate();
 
 }
