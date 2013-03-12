@@ -1,18 +1,73 @@
 @import "compass";
+@import "compass/reset";
+
+* {
+  @include box-sizing(border-box);
+}
 
 #players {
   position: relative;
-  height: 100px;
+  height: 80%;
 }
 
 .player {
   position: absolute;
   left: 0;
   background: red;
-  height: 40px;
-  margin: 5px;
   @include transition(top 0.3s);
+  width: 100%;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
 }
+
+.name,
+.score,
+.incr-decr-wrapper,
+.delete-player-wrapper {
+  @include box-flex(1);
+}
+
+
+@for $i from 1 through 10 {
+  [data-count="#{$i}"] {
+    .player {
+      height: 100% / $i;
+    }
+    @for $j from 1 through $i {
+      [data-place="#{$j}"] {
+        top: (100% / $i) * ($j - 1);
+      }
+    }
+  }
+}
+
+
+
+
+/*
+[data-count="1"] {
+  .player {
+    height: 100%;
+  }
+}
+
+[data-count="2"] {
+  .player {
+    height: 50%;
+  }
+}
+
+[data-count="3"] {
+  .player {
+    height: 33%;
+  }
+}
+
+
+
 
 [data-place="1"] {
   top: 0;
@@ -22,6 +77,8 @@
   top: 50px;
 }
 
+
+
 [data-moved="up"] {
   z-index: 1;
-}
+}*/

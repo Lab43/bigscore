@@ -103,14 +103,15 @@ function Page($) {
     });
     // sort players and insert into page
     $('#players').empty().append( $(html).sortPlayers() );
+    self.count();
   };
 
   this.updateName = function (index, name) {
-    playerAtIndex(index).find('.name').val(name);
+    playerAtIndex(index).find('.name span').html(name);
   };
 
   this.updateScore = function (index, score) {
-    playerAtIndex(index).find('.score').val(score);
+    playerAtIndex(index).find('.score span').html(score);
   };
 
   this.delayedSort = function () {
@@ -125,6 +126,11 @@ function Page($) {
     $('.player').sortPlayers();
   };
 
+  this.count = function () {
+    var count = $('.player').length;
+    $('#players').attr('data-count', count);
+  };
+
   // private methods
   function playerAtIndex(index) {
     return $('.player[data-index="'+index+'"]');
@@ -132,11 +138,17 @@ function Page($) {
   function renderPlayer(p) {
     return [
       '<div class="player" data-index="'+p.index+'">',
-        '<input class="name" value="'+p.name+'" placeholder="Name">',
-        '<input class="score" value="'+p.score+'" placeholder="0">',
-        '<button class="decr">-</button>',
-        '<button class="incr">+</button>',
-        '<button class="delete-player">delete</button>',
+        '<div class="name"><span contenteditable="true">'+p.name+'</span></div>',
+        //'<input class="name" value="'+p.name+'" placeholder="Name">',
+        '<div class="score"><span contenteditable="true">'+p.score+'</span></div>',
+        //'<input class="score" value="'+p.score+'" placeholder="0">',
+        '<div class="incr-decr-wrapper">',
+          '<button class="decr">-</button>',
+          '<button class="incr">+</button>',
+        '</div>',
+        '<div class="delete-player-wrapper">',
+          '<button class="delete-player">delete</button>',
+        '</div>',
       '</div>'
     ].join('');
   }
@@ -172,11 +184,11 @@ function Page($) {
     .on('click', '.decr', function (e) {
       game.decrScore(playerIndexOf(this));
     })
-    .on('keyup', '.name', function (e) {
-      game.updateName(playerIndexOf(this), $(this).val());
+    .on('keyup', '.name span', function (e) {
+      game.updateName(playerIndexOf(this), $(this).html());
     })
-    .on('keyup', '.score', function (e) {
-      game.updateScore(playerIndexOf(this), parseInt($(this).val(), 10));
+    .on('keyup', '.score span', function (e) {
+      game.updateScore(playerIndexOf(this), parseInt($(this).html(), 10));
     })
   ;
 
@@ -208,7 +220,7 @@ function playerIndexOf(elem) {
       sortMe.push({
         prevPlace: parseInt($(this).attr('data-place'), 10) || 0,
         index: i,
-        score: parseInt($(this).find('.score').val(), 10),
+        score: parseInt($(this).find('.score span').html(), 10),
       });
     });
     sortMe.sort(function (a, b) {
@@ -222,7 +234,7 @@ function playerIndexOf(elem) {
       var direction = (place < player.prevPlace) ? 'up' : 'down';
       $($players.get(player.index))
         .attr('data-place', place)
-        .attr('data-moved', direction);
+        .attr('data-moved', direction)
       ;
     });
 

@@ -1,33 +1,411 @@
-/* line 3, ../scss/styles.scss */
-#players {
-  position: relative;
-  height: 100px;
+/* line 17, ../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+/* line 22, ../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+html {
+  line-height: 1;
+}
+
+/* line 24, ../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+ol, ul {
+  list-style: none;
+}
+
+/* line 26, ../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 28, ../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+/* line 30, ../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+q, blockquote {
+  quotes: none;
+}
+/* line 103, ../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
+}
+
+/* line 32, ../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+a img {
+  border: none;
+}
+
+/* line 116, ../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
+  display: block;
+}
+
+/* line 4, ../scss/styles.scss */
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 /* line 8, ../scss/styles.scss */
+#players {
+  position: relative;
+  height: 80%;
+}
+
+/* line 13, ../scss/styles.scss */
 .player {
   position: absolute;
   left: 0;
   background: red;
-  height: 40px;
-  margin: 5px;
   -webkit-transition: top 0.3s;
   -moz-transition: top 0.3s;
   -o-transition: top 0.3s;
   transition: top 0.3s;
+  width: 100%;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
 }
 
-/* line 17, ../scss/styles.scss */
+/* line 29, ../scss/styles.scss */
+.name,
+.score,
+.incr-decr-wrapper,
+.delete-player-wrapper {
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  -ms-box-flex: 1;
+  box-flex: 1;
+}
+
+/* line 36, ../scss/styles.scss */
+[data-count="1"] .player {
+  height: 100%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="1"] [data-place="1"] {
+  top: 0%;
+}
+
+/* line 36, ../scss/styles.scss */
+[data-count="2"] .player {
+  height: 50%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="2"] [data-place="1"] {
+  top: 0%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="2"] [data-place="2"] {
+  top: 50%;
+}
+
+/* line 36, ../scss/styles.scss */
+[data-count="3"] .player {
+  height: 33.33333%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="3"] [data-place="1"] {
+  top: 0%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="3"] [data-place="2"] {
+  top: 33.33333%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="3"] [data-place="3"] {
+  top: 66.66667%;
+}
+
+/* line 36, ../scss/styles.scss */
+[data-count="4"] .player {
+  height: 25%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="4"] [data-place="1"] {
+  top: 0%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="4"] [data-place="2"] {
+  top: 25%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="4"] [data-place="3"] {
+  top: 50%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="4"] [data-place="4"] {
+  top: 75%;
+}
+
+/* line 36, ../scss/styles.scss */
+[data-count="5"] .player {
+  height: 20%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="5"] [data-place="1"] {
+  top: 0%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="5"] [data-place="2"] {
+  top: 20%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="5"] [data-place="3"] {
+  top: 40%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="5"] [data-place="4"] {
+  top: 60%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="5"] [data-place="5"] {
+  top: 80%;
+}
+
+/* line 36, ../scss/styles.scss */
+[data-count="6"] .player {
+  height: 16.66667%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="6"] [data-place="1"] {
+  top: 0%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="6"] [data-place="2"] {
+  top: 16.66667%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="6"] [data-place="3"] {
+  top: 33.33333%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="6"] [data-place="4"] {
+  top: 50%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="6"] [data-place="5"] {
+  top: 66.66667%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="6"] [data-place="6"] {
+  top: 83.33333%;
+}
+
+/* line 36, ../scss/styles.scss */
+[data-count="7"] .player {
+  height: 14.28571%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="7"] [data-place="1"] {
+  top: 0%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="7"] [data-place="2"] {
+  top: 14.28571%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="7"] [data-place="3"] {
+  top: 28.57143%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="7"] [data-place="4"] {
+  top: 42.85714%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="7"] [data-place="5"] {
+  top: 57.14286%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="7"] [data-place="6"] {
+  top: 71.42857%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="7"] [data-place="7"] {
+  top: 85.71429%;
+}
+
+/* line 36, ../scss/styles.scss */
+[data-count="8"] .player {
+  height: 12.5%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="8"] [data-place="1"] {
+  top: 0%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="8"] [data-place="2"] {
+  top: 12.5%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="8"] [data-place="3"] {
+  top: 25%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="8"] [data-place="4"] {
+  top: 37.5%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="8"] [data-place="5"] {
+  top: 50%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="8"] [data-place="6"] {
+  top: 62.5%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="8"] [data-place="7"] {
+  top: 75%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="8"] [data-place="8"] {
+  top: 87.5%;
+}
+
+/* line 36, ../scss/styles.scss */
+[data-count="9"] .player {
+  height: 11.11111%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="9"] [data-place="1"] {
+  top: 0%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="9"] [data-place="2"] {
+  top: 11.11111%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="9"] [data-place="3"] {
+  top: 22.22222%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="9"] [data-place="4"] {
+  top: 33.33333%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="9"] [data-place="5"] {
+  top: 44.44444%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="9"] [data-place="6"] {
+  top: 55.55556%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="9"] [data-place="7"] {
+  top: 66.66667%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="9"] [data-place="8"] {
+  top: 77.77778%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="9"] [data-place="9"] {
+  top: 88.88889%;
+}
+
+/* line 36, ../scss/styles.scss */
+[data-count="10"] .player {
+  height: 10%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="10"] [data-place="1"] {
+  top: 0%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="10"] [data-place="2"] {
+  top: 10%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="10"] [data-place="3"] {
+  top: 20%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="10"] [data-place="4"] {
+  top: 30%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="10"] [data-place="5"] {
+  top: 40%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="10"] [data-place="6"] {
+  top: 50%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="10"] [data-place="7"] {
+  top: 60%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="10"] [data-place="8"] {
+  top: 70%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="10"] [data-place="9"] {
+  top: 80%;
+}
+/* line 40, ../scss/styles.scss */
+[data-count="10"] [data-place="10"] {
+  top: 90%;
+}
+
+/*
+[data-count="1"] {
+  .player {
+    height: 100%;
+  }
+}
+
+[data-count="2"] {
+  .player {
+    height: 50%;
+  }
+}
+
+[data-count="3"] {
+  .player {
+    height: 33%;
+  }
+}
+
+
+
+
 [data-place="1"] {
   top: 0;
 }
 
-/* line 21, ../scss/styles.scss */
 [data-place="2"] {
   top: 50px;
 }
 
-/* line 25, ../scss/styles.scss */
+
+
 [data-moved="up"] {
   z-index: 1;
-}
+}*/
